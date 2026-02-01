@@ -25,10 +25,11 @@ async function bootstrap() {
       ?.split(',')
       .map((origin: string) => origin.trim())
       .filter(Boolean) ?? ['http://localhost:5174'];
+  const allowCredentials = !allowedOrigins.includes('*');
 
   app.enableCors({
     origin: allowedOrigins,
-    credentials: true,
+    credentials: allowCredentials,
   });
   app.useGlobalPipes(
     new ValidationPipe({

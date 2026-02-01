@@ -20,10 +20,7 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        fromService:
-          type: web
-          name: gioia-frontend
-          property: url
+        value: "*"
       - key: UPLOAD_DIR
         value: /var/data/uploads
       - key: DATABASE_URL
@@ -45,16 +42,16 @@ services:
     staticPublishPath: dist
     autoDeploy: true
     envVars:
-      - key: VITE_API_URL
+      - key: VITE_API_HOST
         fromService:
           type: web
           name: gioia-backend
-          property: url
-      - key: VITE_SOCKET_URL
+          property: host
+      - key: VITE_SOCKET_HOST
         fromService:
           type: web
           name: gioia-backend
-          property: url
+          property: host
 
 databases:
   - name: gioia-db
