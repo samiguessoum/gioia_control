@@ -69,7 +69,7 @@ export class AdminMenuController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: path.join(process.cwd(), 'uploads'),
+        destination: process.env.UPLOAD_DIR ?? path.join(process.cwd(), 'uploads'),
         filename: (_req, file, cb) => {
           const ext = path.extname(file.originalname);
           const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;

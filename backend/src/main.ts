@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import * as path from 'path';
 import * as express from 'express';
+import * as fs from 'fs';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -13,7 +14,11 @@ async function bootstrap() {
 
   app.use(helmet());
   app.use(cookieParser());
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  const uploadDir = config.get('UPLOAD_DIR') ?? path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  app.use('/uploads', express.static(uploadDir));
   const allowedOrigins =
     config
       .get('CORS_ORIGIN')
