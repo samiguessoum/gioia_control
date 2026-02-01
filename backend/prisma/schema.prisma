@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SERVEUR
+  BAR
+  CUISINE
+}
+
+enum TableStatus {
+  FREE
+  OCCUPIED
+}
+
+enum MenuItemType {
+  FOOD
+  DRINK
+}
+
+enum OrderStatus {
+  OPEN
+  SENT
+  CLOSED
+  CANCELLED
+}
+
+enum Station {
+  KITCHEN
+  BAR
+}
+
+enum OrderItemStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model User {
+  id                String   @id @default(uuid())
+  name              String
+  email             String?  @unique
+  pinHash           String?
+  passwordHash      String?
+  refreshTokenHash  String?
+  role              Role
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  ordersCreated     Order[]  @relation("OrdersCreated")
+}
+
+model Table {
+  id             String      @id @default(uuid())
+  number         Int         @unique
+  status         TableStatus @default(FREE)
+  currentOrderId String?     @unique
+  currentOrder   Order?      @relation("CurrentOrder", fields: [currentOrderId], references: [id])
+
+  orders         Order[]
+}
+
+model MenuCategory {
+  id        String   @id @default(uuid())
+  name      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id           String       @id @default(uuid())
+  categoryId   String
+  name         String
+  description  String?
+  ingredients  String?
+  recipeText   String?
+  imageUrl     String?
+  priceCents   Int
+  vatRate      Float?
+  type         MenuItemType
+  isAvailable  Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+
+  category     MenuCategory @relation(fields: [categoryId], references: [id])
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  tableId          String
+  status           OrderStatus @default(OPEN)
+  createdByUserId  String
+  createdAt        DateTime    @default(now())
+  closedAt         DateTime?
+
+  table            Table       @relation(fields: [tableId], references: [id])
+  currentTable     Table?      @relation("CurrentOrder")
+  createdBy        User        @relation("OrdersCreated", fields: [createdByUserId], references: [id])
+  items            OrderItem[]
+
+  @@index([tableId, status])
+}
+
+model OrderItem {
+  id                  String          @id @default(uuid())
+  orderId             String
+  menuItemId          String
+  nameSnapshot        String
+  priceCentsSnapshot  Int
+  quantity            Int
+  notes               String?
+  station             Station
+  status              OrderItemStatus @default(NEW)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  order               Order           @relation(fields: [orderId], references: [id])
+  menuItem            MenuItem        @relation(fields: [menuItemId], references: [id])
+
+  @@index([station, status])
+  @@index([orderId])
+}
+
+model EventLog {
+  id        String   @id @default(uuid())
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+}
