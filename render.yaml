@@ -30,10 +30,10 @@ services:
         fromDatabase:
           name: gioia-db
           property: connectionString
-    disks:
-      - name: uploads
-        mountPath: /var/data
-        sizeGB: 1
+    disk:
+      name: uploads
+      mountPath: /var/data
+      sizeGB: 1
 
   - type: web
     name: gioia-frontend
