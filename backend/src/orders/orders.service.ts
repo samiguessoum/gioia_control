@@ -148,9 +148,21 @@ export class OrdersService {
   async closeOrder(orderId: string) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
+      include: { items: true },
     });
     if (!order) {
       throw new NotFoundException('Order not found');
+    }
+
+    // Notifier les stations pour retirer les items de leurs queues
+    const kitchenItems = order.items.filter((i) => i.station === Station.KITCHEN);
+    const barItems = order.items.filter((i) => i.station === Station.BAR);
+
+    if (kitchenItems.length > 0) {
+      this.gateway.emitToStation('KITCHEN', 'station:order_closed', { orderId, itemIds: kitchenItems.map((i) => i.id) });
+    }
+    if (barItems.length > 0) {
+      this.gateway.emitToStation('BAR', 'station:order_closed', { orderId, itemIds: barItems.map((i) => i.id) });
     }
 
     await this.prisma.orderItem.deleteMany({ where: { orderId } });

@@ -32,6 +32,7 @@ export type MenuItem = {
   name: string;
   description?: string;
   ingredients?: string;
+  clientRecipe?: string;
   recipeText?: string;
   imageUrl?: string;
   priceCents: number;

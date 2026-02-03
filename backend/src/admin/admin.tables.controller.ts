@@ -48,7 +48,29 @@ export class AdminTablesController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    // D'abord enlever la référence currentOrderId
+    await this.prisma.table.update({
+      where: { id },
+      data: { currentOrderId: null },
+    });
+
+    // Supprimer les order items des commandes de cette table
+    const orders = await this.prisma.order.findMany({
+      where: { tableId: id },
+      select: { id: true },
+    });
+    const orderIds = orders.map((o) => o.id);
+
+    if (orderIds.length > 0) {
+      await this.prisma.orderItem.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await this.prisma.order.deleteMany({
+        where: { tableId: id },
+      });
+    }
+
     return this.prisma.table.delete({ where: { id } });
   }
 }

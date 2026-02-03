@@ -20,6 +20,10 @@ export class MenuItemUpdateDto {
 
   @IsOptional()
   @IsString()
+  clientRecipe?: string;
+
+  @IsOptional()
+  @IsString()
   recipeText?: string;
 
   @IsOptional()

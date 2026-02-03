@@ -19,6 +19,10 @@ export class MenuItemDto {
 
   @IsOptional()
   @IsString()
+  clientRecipe?: string;
+
+  @IsOptional()
+  @IsString()
   recipeText?: string;
 
   @IsOptional()

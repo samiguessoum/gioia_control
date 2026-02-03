@@ -61,7 +61,29 @@ export class AdminUsersController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    // Supprimer les commandes créées par cet utilisateur
+    const orders = await this.prisma.order.findMany({
+      where: { createdByUserId: id },
+      select: { id: true, tableId: true },
+    });
+    const orderIds = orders.map((o) => o.id);
+
+    if (orderIds.length > 0) {
+      // D'abord enlever les références currentOrderId des tables
+      await this.prisma.table.updateMany({
+        where: { currentOrderId: { in: orderIds } },
+        data: { currentOrderId: null, status: 'FREE' },
+      });
+
+      await this.prisma.orderItem.deleteMany({
+        where: { orderId: { in: orderIds } },
+      });
+      await this.prisma.order.deleteMany({
+        where: { createdByUserId: id },
+      });
+    }
+
     return this.prisma.user.delete({ where: { id } });
   }
 }

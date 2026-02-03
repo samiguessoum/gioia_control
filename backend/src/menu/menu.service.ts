@@ -35,7 +35,23 @@ export class MenuService {
     return this.prisma.menuCategory.update({ where: { id }, data });
   }
 
-  deleteCategory(id: string) {
+  async deleteCategory(id: string) {
+    // Supprimer les orderItems liés aux items de cette catégorie
+    const items = await this.prisma.menuItem.findMany({
+      where: { categoryId: id },
+      select: { id: true },
+    });
+    const itemIds = items.map((i) => i.id);
+
+    if (itemIds.length > 0) {
+      await this.prisma.orderItem.deleteMany({
+        where: { menuItemId: { in: itemIds } },
+      });
+      await this.prisma.menuItem.deleteMany({
+        where: { categoryId: id },
+      });
+    }
+
     return this.prisma.menuCategory.delete({ where: { id } });
   }
 
@@ -47,7 +63,9 @@ export class MenuService {
     return this.prisma.menuItem.update({ where: { id }, data });
   }
 
-  deleteItem(id: string) {
+  async deleteItem(id: string) {
+    // Supprimer les orderItems qui référencent ce produit
+    await this.prisma.orderItem.deleteMany({ where: { menuItemId: id } });
     return this.prisma.menuItem.delete({ where: { id } });
   }
 }

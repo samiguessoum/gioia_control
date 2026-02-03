@@ -173,14 +173,17 @@ export default function ServerOrderPage() {
               {filteredItems.map((item) => (
                 <div key={item.id} className="bg-white/70 rounded-2xl p-4 flex flex-col">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="font-semibold">{item.name}</p>
-                      <p className="text-xs text-ink/60">{item.description}</p>
+                      {item.description && <p className="text-xs text-ink/60">{item.description}</p>}
                       {item.ingredients && (
                         <p className="text-xs text-ink/50 mt-1">{item.ingredients}</p>
                       )}
+                      {item.clientRecipe && (
+                        <p className="text-xs text-basil-600 mt-1">{item.clientRecipe}</p>
+                      )}
                     </div>
-                    <span className="font-semibold">{item.priceCents} DZD</span>
+                    <span className="font-semibold ml-2">{item.priceCents} DZD</span>
                   </div>
                   <textarea
                     className="mt-3 w-full rounded-xl border border-basil-100 px-3 py-2 text-sm"

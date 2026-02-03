@@ -77,14 +77,15 @@ model MenuCategory {
 }
 
 model MenuItem {
-  id           String       @id @default(uuid())
-  categoryId   String
-  name         String
-  description  String?
-  ingredients  String?
-  recipeText   String?
-  imageUrl     String?
-  priceCents   Int
+  id            String       @id @default(uuid())
+  categoryId    String
+  name          String
+  description   String?
+  ingredients   String?
+  clientRecipe  String?
+  recipeText    String?
+  imageUrl      String?
+  priceCents    Int
   vatRate      Float?
   type         MenuItemType
   isAvailable  Boolean      @default(true)

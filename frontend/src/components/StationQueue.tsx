@@ -27,10 +27,15 @@ export default function StationQueue({ station }: { station: 'kitchen' | 'bar' }
     const handler = () => loadQueue();
     socket.on('station:new_items', handler);
     socket.on('station:item_update', handler);
+    const closeHandler = (payload: { orderId: string; itemIds: string[] }) => {
+      setItems((prev) => prev.filter((item) => !payload.itemIds.includes(item.id)));
+    };
+    socket.on('station:order_closed', closeHandler);
     return () => {
       socket.off('connect', joinRoom);
       socket.off('station:new_items', handler);
       socket.off('station:item_update', handler);
+      socket.off('station:order_closed', closeHandler);
     };
   }, [socket, station]);
 
