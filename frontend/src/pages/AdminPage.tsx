@@ -10,8 +10,15 @@ export default function AdminPage() {
   const [tables, setTables] = useState<Table[]>([]);
 
   const [newCategory, setNewCategory] = useState('');
-  const [newItem, setNewItem] = useState({ name: '', ingredients: '', recipeText: '', priceCents: '', categoryId: '', type: 'FOOD' });
-    const [newTableNumber, setNewTableNumber] = useState('');
+  const [newItem, setNewItem] = useState({
+    name: '',
+    ingredients: '',
+    recipeText: '',
+    priceCents: '',
+    categoryId: '',
+    type: 'FOOD',
+  });
+  const [newTableNumber, setNewTableNumber] = useState('');
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', pin: '', role: 'SERVEUR' });
 
   // Modal de confirmation
@@ -76,7 +83,14 @@ export default function AdminPage() {
       type: newItem.type,
       isAvailable: true,
     });
-    setNewItem({ name: '', ingredients: '', recipeText: '', priceCents: '', categoryId: newItem.categoryId, type: newItem.type });
+    setNewItem({
+      name: '',
+      ingredients: '',
+      recipeText: '',
+      priceCents: '',
+      categoryId: newItem.categoryId,
+      type: newItem.type,
+    });
     await loadAll();
   };
 
@@ -229,7 +243,13 @@ export default function AdminPage() {
               <option value="FOOD">FOOD (Cuisine)</option>
               <option value="DRINK">DRINK (Bar)</option>
             </select>
-            <button className="button-primary" onClick={createItem}>Ajouter</button>
+            <button
+              className="button-primary"
+              onClick={createItem}
+              disabled={!newItem.name.trim() || !newItem.priceCents || !newItem.categoryId}
+            >
+              Ajouter
+            </button>
           </div>
           <div className="space-y-2 max-h-96 overflow-auto">
             {items.map((item) => (
